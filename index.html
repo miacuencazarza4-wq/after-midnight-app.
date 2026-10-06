@@ -18,6 +18,11 @@ h1{font-size:31px;line-height:1.04;margin:12px 0}h2{font-size:22px;margin:8px 0}
 .good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}.section-title{display:flex;justify-content:space-between;align-items:center;margin:24px 0 10px}.section-title h2{margin:0}.complete{text-align:center}.check{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;margin:auto;background:var(--green);color:#122019;font-size:26px;font-weight:900}
 textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--line);background:#100c16;color:#fff;padding:12px}.badge{border:1px solid #4b3b54;border-radius:999px;padding:5px 8px;font-size:10px}.screen{display:none}.screen.active{display:block}
 .chatlog{display:grid;gap:12px;min-height:330px;max-height:56vh;overflow:auto;padding:8px 0 16px}.composer{position:sticky;bottom:68px;background:#100c17;padding:10px 0;display:grid;grid-template-columns:1fr auto;gap:8px}.composer input{border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:13px;font-size:15px;min-width:0}.typing{color:var(--muted);font-size:12px}
+.danger{border:1px solid #7a414c;background:#2b161d;color:#ffb8c2;border-radius:10px;padding:7px 9px;font-size:11px;cursor:pointer}
+.empty-state{text-align:center;padding:28px 16px;border:1px dashed #4b3b54;border-radius:18px;color:var(--muted)}
+.character-grid{display:grid;gap:10px}.picker-card{display:grid;grid-template-columns:48px 1fr auto;gap:11px;align-items:center;text-align:left;color:inherit;cursor:pointer}
+.profile-switch{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.profile-mode{border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:12px;cursor:pointer}.profile-mode.on{background:var(--pink);color:#24121c;border-color:transparent}
+.tiny{font-size:10px;color:var(--muted)}
 
 .searchbox{display:grid;grid-template-columns:1fr auto;gap:8px;margin:14px 0}
 .searchbox input{border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:13px;font-size:15px;min-width:0}
@@ -39,23 +44,38 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
 
 <section id="episode" class="screen"><div class="top"><div><div class="k">Breaking Bad · Season 1</div><strong>Episode 1</strong></div><span class="badge">Pilot</span></div><div class="pad"><h1>Pilot</h1><p>A high-school chemistry teacher receives a devastating diagnosis and reconnects with a former student.</p><button class="btn full" id="watched-btn">Mark as Watched</button><button class="btn ghost full" style="margin-top:9px" id="start-trivia">Start 3-question Trivia</button><div id="trivia-area"></div><div class="notice" style="margin-top:12px"><strong>Spoiler lock:</strong> story-changing events wait until every active member has marked the episode watched.</div></div></section>
 
-<section id="chats" class="screen"><div class="top"><div><div class="k">Club, characters & episode rooms</div><strong>Chats</strong></div><span class="badge">AI live</span></div><div class="pad stack"><button class="card chatrow" data-character="jesse"><div class="avatar">🧢</div><div><strong>Jesse Pinkman</strong><div class="muted" style="font-size:11px">AI character chat</div></div><span>›</span></button><button class="card chatrow" data-character="walter"><div class="avatar">🧪</div><div><strong>Walter White</strong><div class="muted" style="font-size:11px">AI character chat</div></div><span>›</span></button><button class="card chatrow" data-character="skyler"><div class="avatar">📘</div><div><strong>Skyler White</strong><div class="muted" style="font-size:11px">AI character chat</div></div><span>›</span></button><button class="card chatrow" data-character="hank"><div class="avatar">🛡️</div><div><strong>Hank Schrader</strong><div class="muted" style="font-size:11px">AI character chat</div></div><span>›</span></button></div></section>
+<section id="chats" class="screen">
+  <div class="top"><div><div class="k">Your conversations</div><strong>Chats</strong></div><button class="mini" data-open="character-picker">＋ New chat</button></div>
+  <div class="pad"><div id="active-chat-list" class="stack"></div></div>
+</section>
+<section id="character-picker" class="screen">
+  <div class="top"><button class="mini" data-open="chats">‹ Back</button><strong>Choose a character</strong><span class="badge">AI</span></div>
+  <div class="pad"><h1>Who do you want to talk to?</h1><p>Only characters you choose will appear in your chat inbox.</p><div id="character-picker-list" class="character-grid"></div></div>
+</section>
 
-<section id="character-chat" class="screen"><div class="top"><div><div class="k">AI character chat</div><strong id="char-title">Jesse Pinkman</strong></div><span class="badge" id="trust-badge">Familiar ♥♡♡♡</span></div><div class="pad"><div class="notice"><span class="good">AI connected through the backend.</span> The character receives recent chat context and the current episode boundary.</div><div id="chatlog" class="chatlog"></div><div id="typing" class="typing"></div><div class="composer"><input id="chat-input" placeholder="Message the character…" autocomplete="off"><button id="send-chat" class="btn">Send</button></div></div></section>
+<section id="character-chat" class="screen">
+  <div class="top"><button class="mini" data-open="chats">‹ Back</button><div style="text-align:center"><div class="k">private character chat</div><strong id="char-title">Jesse Pinkman</strong></div><button id="chat-menu" class="mini">•••</button></div>
+  <div class="pad">
+    <div class="row between" style="margin-bottom:9px"><span class="badge" id="trust-badge">Stranger ♥♡♡♡</span><span class="tiny" id="profile-mode-label">Normal profile</span></div>
+    <div id="chat-actions" class="card" style="display:none;margin-bottom:10px"><button id="delete-chat" class="danger full">Delete conversation</button><button id="forget-chat" class="danger full" style="margin-top:8px">Forget me completely</button></div>
+    <div id="chatlog" class="chatlog"></div><div id="typing" class="typing"></div><div class="composer"><input id="chat-input" placeholder="Message the character…" autocomplete="off"><button id="send-chat" class="btn">Send</button></div>
+  </div>
+</section>
 
 <section id="challenges" class="screen"><div class="top"><div><div class="k">Personalized to your goals</div><strong>Challenges</strong></div><span class="badge">+25 XP</span></div><div class="pad"><div class="card"><div class="row between"><span class="badge">🧢 Jesse</span><span class="muted">Get Active</span></div><h2>Quick challenge</h2><p>10 squats — or swap for a 2-minute stretch.</p><button class="btn full" id="challenge-btn">Complete Challenge</button></div></div></section>
 <section id="journal" class="screen"><div class="top"><div><div class="k">Only you can see this</div><strong>Private Journal</strong></div><span class="badge">🔒</span></div><div class="pad"><div class="card"><div class="k">Breaking Bad · Season 1</div><h2>My Journey</h2><textarea id="journal-text" placeholder="Write something…"></textarea><button class="btn ghost full" style="margin-top:9px" id="journal-save">Save private entry</button></div></div></section>
 
 <section id="catalog" class="screen">
   <div class="top">
-    <div><div class="k">Series + books</div><strong>Explore Everything</strong></div>
+    <div><div class="k">Series · movies · books</div><strong>Explore Everything</strong></div>
     <span class="badge">Live catalog</span>
   </div>
   <div class="pad">
     <h1>Find your next club</h1>
-    <p>Search real TV series and books. The app pulls title metadata live instead of manually hard-coding every fandom.</p>
+    <p>Search real series, movies and books and build a club around the title you choose.</p>
     <div class="tabs">
       <button class="tab on" id="tab-series">📺 Series</button>
+      <button class="tab" id="tab-movies">🎬 Movies</button>
       <button class="tab" id="tab-books">📚 Books</button>
     </div>
     <div class="searchbox">
@@ -66,13 +86,14 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
       <button class="mini quick-search" data-q="Stranger Things" data-type="series">Stranger Things</button>
       <button class="mini quick-search" data-q="Wednesday" data-type="series">Wednesday</button>
       <button class="mini quick-search" data-q="The Last of Us" data-type="series">The Last of Us</button>
+      <button class="mini quick-search" data-q="The Dark Knight" data-type="movies">The Dark Knight</button>
       <button class="mini quick-search" data-q="Harry Potter" data-type="books">Harry Potter</button>
       <button class="mini quick-search" data-q="The Hunger Games" data-type="books">The Hunger Games</button>
       <button class="mini quick-search" data-q="Percy Jackson" data-type="books">Percy Jackson</button>
     </div>
     <div id="catalog-status" class="muted">Search a title or tap one of the suggestions.</div>
     <div id="catalog-results" class="catalog-grid" style="margin-top:12px"></div>
-    <div class="source-note">Series metadata: TVmaze. Book discovery metadata: Open Library.</div>
+    <div class="source-note">TV data: TVmaze · Books: Open Library · Movies: Wikipedia</div>
   </div>
 </section>
 
@@ -85,15 +106,26 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
   <div class="pad" id="catalog-detail-body"></div>
 </section>
 
-<section id="profile" class="screen"><div class="top"><div><div class="k">Your fandom life</div><strong>Profile</strong></div><span class="badge">✨</span></div><div class="pad"><div class="card" style="text-align:center"><div class="avatar" style="margin:auto;width:70px;height:70px;font-size:28px">✨</div><h2>Mia</h2><p>Character trust grows as you interact.</p></div></div></section>
+<section id="profile" class="screen"><div class="top"><div><div class="k">Your fandom life</div><strong>Profile</strong></div><span class="badge">✨</span></div><div class="pad">
+<div class="card" style="text-align:center"><div class="avatar" style="margin:auto;width:70px;height:70px;font-size:28px">✨</div><h2 id="profile-name">Mia</h2><p id="profile-copy">Test profile with adult-character relationship progression unlocked.</p>
+<div class="profile-switch"><button class="profile-mode" id="mode-mia" data-user-mode="mia">✨ Mia · Test</button><button class="profile-mode" id="mode-guest" data-user-mode="guest">👤 Normal user</button></div>
+<div class="notice" style="margin-top:12px;text-align:left">Test mode unlocks relationship progression for testing. Character-age and safety locks are never bypassed.</div>
+</div></div></section>
 
 <nav class="nav"><button data-open="home" class="on"><b>🏠</b>Home</button><button data-open="map"><b>🗺️</b>Map</button><button data-open="chats"><b>💬</b>Chat</button><button data-open="challenges"><b>⚡</b>Challenges</button><button data-open="journal"><b>📓</b>Journal</button><button data-open="profile"><b>👤</b>Profile</button></nav>
 </div>
 
 <script>
 (function(){
-const profiles={jesse:{name:"Jesse Pinkman",icon:"🧢"},walter:{name:"Walter White",icon:"🧪"},skyler:{name:"Skyler White",icon:"📘"},hank:{name:"Hank Schrader",icon:"🛡️"}};
+const profiles={
+jesse:{name:"Jesse Pinkman",icon:"🧢",universe:"Breaking Bad",series:"Breaking Bad",adult:true},
+walter:{name:"Walter White",icon:"🧪",universe:"Breaking Bad",series:"Breaking Bad",adult:true},
+skyler:{name:"Skyler White",icon:"📘",universe:"Breaking Bad",series:"Breaking Bad",adult:true},
+hank:{name:"Hank Schrader",icon:"🛡️",universe:"Breaking Bad",series:"Breaking Bad",adult:true},
+bruce:{name:"Bruce Wayne",icon:"🦇",universe:"Batman · DC",series:"Batman / DC",adult:true,featured:true}
+};
 let activeCharacter="jesse";
+let userMode=localStorage.getItem("afterMidnightUserMode")||"mia";
 const shows=[{id:"breaking-bad",icon:"⚗️",name:"Breaking Bad",genre:"Crime drama"},{id:"stranger-things",icon:"🚲",name:"Stranger Things",genre:"Sci-fi · Mystery"},{id:"vampire-diaries",icon:"🩸",name:"The Vampire Diaries",genre:"Fantasy · Drama"},{id:"friends",icon:"☕",name:"Friends",genre:"Comedy"},{id:"the-office",icon:"📎",name:"The Office",genre:"Comedy"},{id:"game-of-thrones",icon:"🐉",name:"Game of Thrones",genre:"Fantasy"}];
 let saved=["breaking-bad","stranger-things"];
 let catalogType="series";
@@ -110,8 +142,9 @@ function escAttr(s){return escapeHtml(String(s)).replaceAll("`","&#096;")}
 function setCatalogType(type){
   catalogType=type;
   document.getElementById("tab-series").classList.toggle("on",type==="series");
+  document.getElementById("tab-movies").classList.toggle("on",type==="movies");
   document.getElementById("tab-books").classList.toggle("on",type==="books");
-  document.getElementById("catalog-search").placeholder=type==="series"?"Try: Stranger Things…":"Try: The Hunger Games…";
+  document.getElementById("catalog-search").placeholder=type==="series"?"Try: Stranger Things…":type==="movies"?"Try: The Dark Knight…":"Try: The Hunger Games…";
   document.getElementById("catalog-results").innerHTML="";
   document.getElementById("catalog-status").textContent="Search a title or tap one of the suggestions.";
 }
@@ -136,6 +169,14 @@ async function searchCatalog(q){
         };
       });
       items.forEach(x=>catalogCache.set("series:"+x.id,x));
+      renderCatalogResults(items);
+    }else if(catalogType==="movies"){
+      const url="https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q+" film")+"&gsrnamespace=0&gsrlimit=12&prop=extracts|pageimages&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=300&format=json&origin=*";
+      const r=await fetch(url);
+      if(!r.ok)throw new Error("Movie search failed");
+      const data=await r.json();
+      const items=Object.values(data.query?.pages||{}).map(p=>({kind:"movies",id:String(p.pageid),name:p.title||"Untitled",summary:p.extract||"",thumbnail:p.thumbnail?.source||"",genres:["Film"]}));
+      items.forEach(x=>catalogCache.set("movies:"+x.id,x));
       renderCatalogResults(items);
     }else{
       const fields="key,title,author_name,first_publish_year,edition_count,cover_i,subject";
@@ -166,6 +207,9 @@ function renderCatalogResults(items){
         <div><strong>${escapeHtml(x.name)}</strong><div class="muted" style="font-size:11px">${escapeHtml(meta||"TV series")}</div>
         <div class="chips">${x.genres.slice(0,3).map(g=>`<span class="chip">${escapeHtml(g)}</span>`).join("")}</div></div><span>›</span></button>`;
     }
+    if(x.kind==="movies"){
+      return `<button class="catalog-card" data-catalog-kind="movies" data-catalog-id="${x.id}" style="color:inherit;text-align:left;cursor:pointer"><div class="catalog-emoji">🎬</div><div><strong>${escapeHtml(x.name)}</strong><div class="muted" style="font-size:11px">Movie</div><div class="chips"><span class="chip">Film</span></div></div><span>›</span></button>`;
+    }
     const meta=[x.authors[0]||"",x.year||"",x.editions?x.editions+" editions":""].filter(Boolean).join(" · ");
     return `<button class="catalog-card" data-catalog-kind="books" data-catalog-id="${escapeHtml(x.id)}" style="color:inherit;text-align:left;cursor:pointer">
       <div class="catalog-emoji">📚</div>
@@ -177,7 +221,7 @@ async function openCatalogItem(kind,id){
   const item=catalogCache.get(kind+":"+id);
   if(!item)return;
   document.getElementById("catalog-detail-header").textContent=item.name;
-  document.getElementById("catalog-detail-type").textContent=kind==="series"?"TV":"BOOK";
+  document.getElementById("catalog-detail-type").textContent=kind==="series"?"TV":kind==="movies"?"MOVIE":"BOOK";
   const body=document.getElementById("catalog-detail-body");
   body.innerHTML=`<div class="muted">Loading ${escapeHtml(item.name)}…</div>`;
   showScreen("catalog-detail");
@@ -194,10 +238,12 @@ async function openCatalogItem(kind,id){
         ${summary}
         <div class="card" style="margin:14px 0"><strong>${seasons.length} seasons · ${eps.length} episodes</strong>
         <div class="muted" style="font-size:12px;margin-top:5px">${escapeHtml([item.premiered,item.status,item.language].filter(Boolean).join(" · "))}</div></div>
-        <button class="btn full" data-start-catalog="${escapeHtml(item.name)}">Create club with this series</button>
+        <button class="btn full" data-start-catalog="${escapeHtml(item.name)}" data-start-kind="series">Create club with this series</button><div id="club-action-result"></div>
         ${seasons.map(s=>`<div class="section-title"><h2>Season ${s}</h2><span class="muted">${bySeason[s].length} episodes</span></div>
         <div class="episode-list">${bySeason[s].map(e=>`<div class="ep-row"><div class="ep-num">S${e.season}E${e.number||"?"}</div><div><strong>${escapeHtml(e.name||"Episode")}</strong><div class="muted" style="font-size:11px">${escapeHtml(e.airdate||"")}</div></div></div>`).join("")}</div>`).join("")}
-        <div class="source-note">Metadata supplied by TVmaze.</div>`;
+        <div class="source-note">TVmaze</div>`;
+    }else if(kind==="movies"){
+      body.innerHTML=`<div class="k">movie</div><h1 class="catalog-detail-title">${escapeHtml(item.name)}</h1>${item.summary?`<p>${escapeHtml(item.summary.slice(0,1200))}${item.summary.length>1200?"…":""}</p>`:""}<button class="btn full" data-start-catalog="${escapeHtml(item.name)}" data-start-kind="movies">Create club with this movie</button><div id="club-action-result"></div><div class="source-note">Wikipedia</div>`;
     }else{
       let desc="";
       if(item.workKey){
@@ -216,8 +262,7 @@ async function openCatalogItem(kind,id){
         ${desc?`<p>${escapeHtml(desc.slice(0,900))}${desc.length>900?"…":""}</p>`:""}
         <div class="card" style="margin:14px 0"><strong>${item.year?`First published ${escapeHtml(item.year)}`:"Publication year unavailable"}</strong>
         <div class="muted" style="font-size:12px;margin-top:5px">${item.editions?escapeHtml(item.editions)+" known editions":"Edition count unavailable"}</div></div>
-        <button class="btn full" data-start-catalog="${escapeHtml(item.name)}">Create reading club with this book</button>
-        <div class="notice" style="margin-top:12px"><strong>Book spoiler system:</strong> club progress will use chapters/checkpoints. Full copyrighted book text is not imported.</div>
+        <button class="btn full" data-start-catalog="${escapeHtml(item.name)}" data-start-kind="books">Create reading club with this book</button><div id="club-action-result"></div>
         <div class="source-note">Discovery metadata supplied by Open Library.</div>`;
     }
   }catch(err){
@@ -227,18 +272,31 @@ async function openCatalogItem(kind,id){
 
 function renderQuestion(){const a=document.getElementById("trivia-area");if(qi>=questions.length){a.innerHTML=`<div class="card complete" style="margin-top:12px"><div class="check">✓</div><div class="k" style="margin-top:10px">trivia complete</div><h1>${score}/3</h1><p>You finished the round. Your result can be shared to the spoiler-safe Episode 1 chat.</p></div>`;return}const x=questions[qi];a.innerHTML=`<div class="card" style="margin-top:12px"><div class="row between"><div class="k">episode trivia</div><span class="badge">${qi+1}/3</span></div><div class="progress" style="margin:10px 0 14px"><span style="width:${(qi/3)*100}%"></span></div><h3>${x.q}</h3><div class="stack">${x.opts.map(o=>`<button class="quizopt" data-answer="${o.replaceAll('"',"&quot;")}">${o}</button>`).join("")}</div></div>`}
 
-function storageKey(){return "afterMidnightChat:"+activeCharacter}
+function userName(){return userMode==="mia"?"Mia":"Guest"}
+function storageKey(){return "afterMidnightChat:"+userMode+":"+activeCharacter}
+function memoryKey(){return "afterMidnightMemory:"+userMode+":"+activeCharacter}
+function countKey(){return "afterMidnightCount:"+userMode+":"+activeCharacter}
+function activeChatsKey(){return "afterMidnightActiveChats:"+userMode}
 function loadHistory(){try{return JSON.parse(localStorage.getItem(storageKey())||"[]")}catch{return []}}
-function saveHistory(h){localStorage.setItem(storageKey(),JSON.stringify(h.slice(-30)))}
-function renderChat(){const h=loadHistory();const p=profiles[activeCharacter];document.getElementById("char-title").textContent=p.name;const log=document.getElementById("chatlog");log.innerHTML=h.length?h.map(m=>m.role==="user"?`<div class="msg me"><div class="bubble me">${escapeHtml(m.content)}</div></div>`:`<div class="msg"><div class="avatar">${p.icon}</div><div><div class="muted" style="font-size:11px">${p.name}</div><div class="bubble">${escapeHtml(m.content)}</div></div></div>`).join(""):`<div class="muted" style="text-align:center;padding:35px 10px">Start a real conversation with ${p.name}.</div>`;log.scrollTop=log.scrollHeight}
+function saveHistory(h){localStorage.setItem(storageKey(),JSON.stringify(h.slice(-40)))}
+function loadActiveChats(){try{return JSON.parse(localStorage.getItem(activeChatsKey())||"[]")}catch{return []}}
+function saveActiveChats(a){localStorage.setItem(activeChatsKey(),JSON.stringify([...new Set(a)]))}
+function addActiveChat(id){const a=loadActiveChats();if(!a.includes(id)){a.unshift(id);saveActiveChats(a)}renderActiveChats()}
+function interactionCount(){return Number(localStorage.getItem(countKey())||0)}
+function trustLevel(){if(userMode==="mia")return "Inner Circle";const n=interactionCount();if(n>=25)return "Inner Circle";if(n>=12)return "Trusted";if(n>=4)return "Familiar";return "Stranger"}
+function trustHearts(level){return level==="Inner Circle"?"♥♥♥♥":level==="Trusted"?"♥♥♥♡":level==="Familiar"?"♥♥♡♡":"♥♡♡♡"}
+function renderPicker(){document.getElementById("character-picker-list").innerHTML=Object.entries(profiles).map(([id,p])=>`<button class="card picker-card" data-pick-character="${id}"><div class="avatar">${p.icon}</div><div><strong>${escapeHtml(p.name)}</strong><div class="muted" style="font-size:11px">${escapeHtml(p.universe)}${p.featured?" · Featured":""}</div></div><span>＋</span></button>`).join("")}
+function renderActiveChats(){let a=loadActiveChats();const el=document.getElementById("active-chat-list");if(!a.length){el.innerHTML=`<div class="empty-state"><div style="font-size:32px">💬</div><h3>No conversations yet</h3><p>Choose a character and start talking.</p><button class="btn" data-open="character-picker">Choose a character</button></div>`;return}el.innerHTML=a.filter(id=>profiles[id]).map(id=>{const p=profiles[id];let hh=[];try{hh=JSON.parse(localStorage.getItem("afterMidnightChat:"+userMode+":"+id)||"[]")}catch{}const last=hh[hh.length-1]?.content||"Start chatting";return `<button class="card chatrow" data-character="${id}"><div class="avatar">${p.icon}</div><div><strong>${escapeHtml(p.name)}</strong><div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px">${escapeHtml(last.slice(0,60))}</div></div><span>›</span></button>`}).join("")}
+function renderProfileMode(){document.getElementById("mode-mia").classList.toggle("on",userMode==="mia");document.getElementById("mode-guest").classList.toggle("on",userMode==="guest");document.getElementById("profile-name").textContent=userMode==="mia"?"Mia":"Normal user";document.getElementById("profile-copy").textContent=userMode==="mia"?"Test profile with adult-character relationship progression unlocked.":"Normal profile: trust grows naturally as you interact."}
+function renderChat(){const h=loadHistory();const p=profiles[activeCharacter];const trust=trustLevel();document.getElementById("char-title").textContent=p.name;document.getElementById("trust-badge").textContent=trust+" "+trustHearts(trust);document.getElementById("profile-mode-label").textContent=userMode==="mia"?"Mia · Test":"Normal profile";const log=document.getElementById("chatlog");log.innerHTML=h.length?h.map(m=>m.role==="user"?`<div class="msg me"><div class="bubble me">${escapeHtml(m.content)}</div></div>`:`<div class="msg"><div class="avatar">${p.icon}</div><div><div class="muted" style="font-size:11px">${p.name}</div><div class="bubble">${escapeHtml(m.content)}</div></div></div>`).join(""):`<div class="muted" style="text-align:center;padding:35px 10px">Start a conversation with ${p.name}.</div>`;log.scrollTop=log.scrollHeight}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
 async function sendMessage(){
  const input=document.getElementById("chat-input");const message=input.value.trim();if(!message)return;
- let history=loadHistory();history.push({role:"user",name:"Mia",content:message});saveHistory(history);input.value="";renderChat();
+ let history=loadHistory();history.push({role:"user",name:userName(),content:message});saveHistory(history);localStorage.setItem(countKey(),String(interactionCount()+1));addActiveChat(activeCharacter);input.value="";renderChat();
  const typing=document.getElementById("typing");typing.textContent=profiles[activeCharacter].name+" is typing…";document.getElementById("send-chat").disabled=true;
  try{
-   const r=await fetch("https://after-midnight-ai-backend.vercel.app/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({characterId:activeCharacter,message,history:history.slice(0,-1),userName:"Mia",series:"Breaking Bad",season:1,episode:1,trust:"Familiar"})});
+   const r=await fetch("https://after-midnight-ai-backend.vercel.app/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({characterId:activeCharacter,message,history:history.slice(0,-1),userName:userName(),series:profiles[activeCharacter].series,season:profiles[activeCharacter].series==="Breaking Bad"?1:null,episode:profiles[activeCharacter].series==="Breaking Bad"?1:null,trust:trustLevel(),memorySummary:localStorage.getItem(memoryKey())||""})});
    const data=await r.json();
    if(!r.ok)throw new Error(data.error||"Chat request failed");
    history=loadHistory();history.push({role:"assistant",content:data.reply});saveHistory(history);renderChat();
@@ -249,10 +307,12 @@ async function sendMessage(){
 
 document.addEventListener("click",e=>{
  const quick=e.target.closest(".quick-search");if(quick){setCatalogType(quick.dataset.type);document.getElementById("catalog-search").value=quick.dataset.q;searchCatalog(quick.dataset.q);return}
+ const picked=e.target.closest("[data-pick-character]");if(picked){activeCharacter=picked.dataset.pickCharacter;addActiveChat(activeCharacter);renderChat();showScreen("character-chat");return}
+ const mode=e.target.closest("[data-user-mode]");if(mode){userMode=mode.dataset.userMode;localStorage.setItem("afterMidnightUserMode",userMode);renderProfileMode();renderActiveChats();return}
  const cat=e.target.closest("[data-catalog-kind]");if(cat){openCatalogItem(cat.dataset.catalogKind,cat.dataset.catalogId);return}
- const starter=e.target.closest("[data-start-catalog]");if(starter){alert("Club setup for “"+starter.dataset.startCatalog+"” is the next step. The title metadata is already connected.");return}
+ const starter=e.target.closest("[data-start-catalog]");if(starter){localStorage.setItem("afterMidnightClubDraft",JSON.stringify({title:starter.dataset.startCatalog,kind:starter.dataset.startKind||catalogType,createdAt:Date.now()}));const result=document.getElementById("club-action-result");if(result)result.innerHTML='<div class="notice" style="margin-top:12px"><span class="good">✓ Club created.</span> You can now invite members and set your pace.</div>';starter.textContent="✓ Club created";starter.classList.add("ghost");return}
  const open=e.target.closest("[data-open]");if(open){showScreen(open.dataset.open);return}
- const char=e.target.closest("[data-character]");if(char){activeCharacter=char.dataset.character;renderChat();showScreen("character-chat");return}
+ const char=e.target.closest("[data-character]");if(char){activeCharacter=char.dataset.character;addActiveChat(activeCharacter);renderChat();showScreen("character-chat");return}
  const save=e.target.closest("[data-save]");if(save){const id=save.dataset.save;saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];renderLists();return}
  const series=e.target.closest("[data-series]");if(series){if(series.dataset.series==="breaking-bad")showScreen("map");else alert("Full content pack coming next for this title.");return}
  const ans=e.target.closest("[data-answer]");if(ans){if(ans.dataset.answer===questions[qi].a)score++;qi++;renderQuestion()}
@@ -262,11 +322,15 @@ document.getElementById("start-trivia").onclick=function(){qi=0;score=0;renderQu
 document.getElementById("challenge-btn").onclick=function(){this.textContent="✓ Challenge completed · +25 XP";this.classList.add("ghost")};
 const j=document.getElementById("journal-text");j.value=localStorage.getItem("afterMidnightJournal")||"";document.getElementById("journal-save").onclick=function(){localStorage.setItem("afterMidnightJournal",j.value);this.textContent="✓ Saved privately"};
 document.getElementById("tab-series").onclick=()=>setCatalogType("series");
+document.getElementById("tab-movies").onclick=()=>setCatalogType("movies");
 document.getElementById("tab-books").onclick=()=>setCatalogType("books");
 document.getElementById("catalog-search-btn").onclick=()=>searchCatalog();
 document.getElementById("catalog-search").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchCatalog()}});
+document.getElementById("chat-menu").onclick=function(){const a=document.getElementById("chat-actions");a.style.display=a.style.display==="none"?"block":"none"};
+document.getElementById("delete-chat").onclick=function(){const p=profiles[activeCharacter];const history=loadHistory();if(!confirm("Delete your visible conversation with "+p.name+"? A small relationship memory can stay on this device."))return;const userLines=history.filter(m=>m.role==="user").slice(-6).map(m=>m.content.trim()).filter(Boolean);if(userLines.length)localStorage.setItem(memoryKey(),"Previous conversation themes: "+userLines.join(" | "));localStorage.removeItem(storageKey());saveActiveChats(loadActiveChats().filter(id=>id!==activeCharacter));renderActiveChats();showScreen("chats")};
+document.getElementById("forget-chat").onclick=function(){const p=profiles[activeCharacter];if(!confirm("Forget everything about your relationship with "+p.name+"? This also resets trust."))return;localStorage.removeItem(storageKey());localStorage.removeItem(memoryKey());localStorage.removeItem(countKey());saveActiveChats(loadActiveChats().filter(id=>id!==activeCharacter));renderActiveChats();showScreen("chats")};
 document.getElementById("send-chat").onclick=sendMessage;document.getElementById("chat-input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
-renderLists();
+renderLists();renderPicker();renderActiveChats();renderProfileMode();
 })();
 </script>
 </body></html>
