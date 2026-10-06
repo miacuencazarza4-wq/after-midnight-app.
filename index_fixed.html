@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>After Midnight</title>
+<style>
+:root{
+  --bg:#0e0b14;--panel:#1b1523;--panel2:#241c2d;--line:#3b3048;
+  --text:#fff8fb;--muted:#aa9cab;--pink:#f3a7c9;--pink2:#ffd2e4;
+  --green:#9ee6ba;--red:#e7adad
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0,#2c1834,transparent 36%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{width:min(100%,470px);min-height:100vh;margin:auto;background:#100c17;padding-bottom:88px}
+.top{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:#100c17ee;border-bottom:1px solid #282031;backdrop-filter:blur(16px)}
+.k{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--pink);font-weight:800}
+.pad{padding:22px 18px}
+.card{background:linear-gradient(180deg,var(--panel2),#191320);border:1px solid var(--line);border-radius:20px;padding:15px}
+.stack{display:grid;gap:11px}
+.row{display:flex;gap:9px;align-items:center}.between{justify-content:space-between}
+h1{font-size:31px;line-height:1.04;margin:12px 0}h2{font-size:22px;margin:8px 0}h3{margin:8px 0}
+p,.muted{color:var(--muted);line-height:1.45}
+.btn{border:0;background:linear-gradient(135deg,var(--pink2),var(--pink));color:#25131d;font-weight:850;border-radius:14px;padding:12px 14px;cursor:pointer}
+.ghost{background:#211827;color:var(--pink2);border:1px solid #49384f}
+.full{width:100%}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,470px);display:grid;grid-template-columns:repeat(6,1fr);background:#100c17f5;border-top:1px solid var(--line);padding:9px 5px 12px;z-index:10}
+.nav button{background:none;border:0;color:#8e8292;font-size:10px;display:grid;gap:3px;cursor:pointer}.nav button b{font-size:18px}.nav .on{color:var(--pink2)}
+.scroll{display:flex;overflow:auto;gap:10px;padding-bottom:4px}
+.show{min-width:190px;background:linear-gradient(145deg,#40283e,#17131f);border:1px solid var(--line);border-radius:18px;padding:14px}
+.show:nth-child(2n){background:linear-gradient(145deg,#294052,#17131f)}
+.icon{font-size:30px}.mini{border:1px solid #5b4861;background:#17121d;color:#eee;border-radius:9px;padding:7px 8px;font-size:11px;cursor:pointer}.saved{background:var(--pink);color:#22131c}
+.episode{width:100%;display:grid;grid-template-columns:44px 1fr auto;text-align:left;color:inherit;gap:10px;align-items:center;cursor:pointer}
+.node{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:var(--pink);color:#24121c;font-weight:900}.lock{opacity:.45}
+.progress{height:7px;border-radius:20px;background:#2c2435;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#bca8ff)}
+.quizopt{width:100%;text-align:left;background:#14101a;border:1px solid var(--line);color:#fff;border-radius:12px;padding:12px;cursor:pointer}
+.chatrow{width:100%;display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;text-align:left;color:#fff;cursor:pointer}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#34253b}
+.bubble{padding:10px 12px;border-radius:6px 16px 16px;background:#281d2c;border:1px solid #4b354e}
+.notice{padding:13px;border-left:3px solid var(--pink);background:#211725;border-radius:0 12px 12px 0;color:#d8cbd7}
+.good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:24px 0 10px}.section-title h2{margin:0}
+.complete{text-align:center}.check{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;margin:auto;background:var(--green);color:#122019;font-size:26px;font-weight:900}
+textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--line);background:#100c16;color:#fff;padding:12px}
+.chatbox{display:grid;gap:10px}.badge{border:1px solid #4b3b54;border-radius:999px;padding:5px 8px;font-size:10px}
+.screen{display:none}.screen.active{display:block}
+@media(min-width:760px){body{padding:24px 0}.app{border-radius:26px;overflow:hidden;min-height:calc(100vh - 48px)}.nav{bottom:24px;border-radius:0 0 26px 26px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="home" class="screen active">
+  <div class="top"><div><div class="k">Girls Who Can’t Finish a Show</div><strong>Home</strong></div><span class="badge">4 👥</span></div>
+  <div class="pad">
+    <h1>Pick up where you left off</h1>
+    <button class="card episode" data-open="map">
+      <div class="node">▶</div>
+      <div><div class="k">continue club</div><h2>Breaking Bad</h2><div class="muted">5 seasons · 62 episodes · Season 1 in progress</div></div><span>›</span>
+    </button>
+
+    <div class="section-title"><h2>My List</h2><span class="muted" id="saved-count">2 saved</span></div>
+    <div class="scroll" id="my-list"></div>
+
+    <div class="section-title"><h2>Explore</h2><span class="muted">Watch later</span></div>
+    <div class="scroll" id="explore"></div>
+  </div>
+</section>
+
+<section id="map" class="screen">
+  <div class="top"><div><div class="k">Season 1 · club progress</div><strong>Breaking Bad</strong></div><span class="badge">4 👥</span></div>
+  <div class="pad">
+    <div class="card">
+      <div class="row between"><div><div class="k">series metadata</div><strong>5 seasons · 62 episodes</strong></div><span class="badge">TV data</span></div>
+      <p>Season 1 contains 7 episodes. Episode titles and metadata will come from the series data service in the full app.</p>
+    </div>
+    <div class="stack" style="margin-top:12px">
+      <button class="card episode" data-open="episode"><div class="node">1</div><div><strong>Episode 1</strong><div>Pilot</div><div class="muted" style="font-size:11px">1/4 watched</div></div><span>›</span></button>
+      <button class="card episode lock"><div class="node">2</div><div><strong>Episode 2</strong><div>???</div><div class="muted" style="font-size:11px">locked until group advances</div></div><span>🔒</span></button>
+      <button class="card episode lock"><div class="node">3</div><div><strong>Episode 3</strong><div>???</div></div><span>🔒</span></button>
+      <button class="card episode lock"><div class="node">4</div><div><strong>Episode 4</strong><div>???</div></div><span>🔒</span></button>
+      <button class="card episode lock"><div class="node">5</div><div><strong>Episode 5</strong><div>???</div></div><span>🔒</span></button>
+      <button class="card episode lock"><div class="node">6</div><div><strong>Episode 6</strong><div>???</div></div><span>🔒</span></button>
+      <button class="card episode lock"><div class="node">7</div><div><strong>Episode 7</strong><div>???</div></div><span>🔒</span></button>
+    </div>
+  </div>
+</section>
+
+<section id="episode" class="screen">
+  <div class="top"><div><div class="k">Breaking Bad · Season 1</div><strong>Episode 1</strong></div><span class="badge">Pilot</span></div>
+  <div class="pad">
+    <h1>Pilot</h1>
+    <p>A high-school chemistry teacher receives a devastating diagnosis and reconnects with a former student.</p>
+    <button class="btn full" id="watched-btn">Mark as Watched</button>
+    <button class="btn ghost full" style="margin-top:9px" id="start-trivia">Start 3-question Trivia</button>
+    <div id="trivia-area"></div>
+    <div class="notice" style="margin-top:12px"><strong>Spoiler lock:</strong> story-changing events wait until every active member has marked the episode watched.</div>
+  </div>
+</section>
+
+<section id="chats" class="screen">
+  <div class="top"><div><div class="k">Club, characters & episode rooms</div><strong>Chats</strong></div><span class="badge">6</span></div>
+  <div class="pad stack">
+    <button class="card chatrow"><div class="avatar">💬</div><div><strong>Club Chat</strong><div class="muted" style="font-size:11px">Everyone + active characters</div></div><span>›</span></button>
+    <button class="card chatrow" data-open="jesse"><div class="avatar">🧢</div><div><strong>Jesse Pinkman</strong><div class="muted" style="font-size:11px">Character chat · shared with club</div></div><span>›</span></button>
+    <button class="card chatrow"><div class="avatar">🧪</div><div><strong>Walter White</strong><div class="muted" style="font-size:11px">Character chat · shared with club</div></div><span>›</span></button>
+    <button class="card chatrow"><div class="avatar">📘</div><div><strong>Skyler White</strong><div class="muted" style="font-size:11px">Character chat · shared with club</div></div><span>›</span></button>
+    <button class="card chatrow"><div class="avatar">🛡️</div><div><strong>Hank Schrader</strong><div class="muted" style="font-size:11px">Character chat · shared with club</div></div><span>›</span></button>
+    <button class="card chatrow"><div class="avatar">🎬</div><div><strong>Episode 1</strong><div class="muted" style="font-size:11px">Pilot discussion · spoiler-safe</div></div><span>›</span></button>
+  </div>
+</section>
+
+<section id="jesse" class="screen">
+  <div class="top"><div><div class="k">Character chat</div><strong>Jesse Pinkman</strong></div><span class="badge">Familiar ♥♡♡♡</span></div>
+  <div class="pad">
+    <div class="notice"><span class="bad">Preview mode:</span> GitHub Pages is frontend-only. Real AI will be connected through a secure backend so the API key is never exposed in the browser.</div>
+    <div class="chatbox" style="margin-top:14px">
+      <div class="row"><div class="avatar">🧢</div><div><div class="muted" style="font-size:11px">Jesse Pinkman · AI</div><div class="bubble">Real conversation will appear here once the backend is connected.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="challenges" class="screen">
+  <div class="top"><div><div class="k">Personalized to your goals</div><strong>Challenges</strong></div><span class="badge">+25 XP</span></div>
+  <div class="pad">
+    <div class="card">
+      <div class="row between"><span class="badge">🧢 Jesse</span><span class="muted">Get Active</span></div>
+      <h2>Quick challenge</h2><p>10 squats — or swap for a 2-minute stretch.</p>
+      <button class="btn full" id="challenge-btn">Complete Challenge</button>
+    </div>
+  </div>
+</section>
+
+<section id="journal" class="screen">
+  <div class="top"><div><div class="k">Only you can see this</div><strong>Private Journal</strong></div><span class="badge">🔒</span></div>
+  <div class="pad">
+    <div class="card">
+      <div class="k">Breaking Bad · Season 1</div><h2>My Journey</h2>
+      <textarea id="journal-text" placeholder="Write something about this week's episodes, your group, or your favorite character..."></textarea>
+      <button class="btn ghost full" style="margin-top:9px" id="journal-save">Save private entry</button>
+    </div>
+  </div>
+</section>
+
+<section id="profile" class="screen">
+  <div class="top"><div><div class="k">Your fandom life</div><strong>Profile</strong></div><span class="badge">✨</span></div>
+  <div class="pad"><div class="card" style="text-align:center"><div class="avatar" style="margin:auto;width:70px;height:70px;font-size:28px">✨</div><h2>Mia</h2><p>Jesse trust: Familiar ♥♡♡♡</p></div></div>
+</section>
+
+<nav class="nav">
+  <button data-open="home" class="on"><b>🏠</b>Home</button>
+  <button data-open="map"><b>🗺️</b>Map</button>
+  <button data-open="chats"><b>💬</b>Chat</button>
+  <button data-open="challenges"><b>⚡</b>Challenges</button>
+  <button data-open="journal"><b>📓</b>Journal</button>
+  <button data-open="profile"><b>👤</b>Profile</button>
+</nav>
+</div>
+
+<script>
+(function(){
+  var shows=[
+    {id:"breaking-bad",icon:"⚗️",name:"Breaking Bad",genre:"Crime drama"},
+    {id:"stranger-things",icon:"🚲",name:"Stranger Things",genre:"Sci-fi · Mystery"},
+    {id:"vampire-diaries",icon:"🩸",name:"The Vampire Diaries",genre:"Fantasy · Drama"},
+    {id:"friends",icon:"☕",name:"Friends",genre:"Comedy"},
+    {id:"the-office",icon:"📎",name:"The Office",genre:"Comedy"},
+    {id:"game-of-thrones",icon:"🐉",name:"Game of Thrones",genre:"Fantasy"},
+    {id:"bridgerton",icon:"🪻",name:"Bridgerton",genre:"Period drama"},
+    {id:"wednesday",icon:"🕷️",name:"Wednesday",genre:"Mystery"}
+  ];
+  var saved=["breaking-bad","stranger-things"];
+  var questions=[
+    {q:"What subject does Walter White teach?",opts:["Chemistry","Physics","Biology","Mathematics"],a:"Chemistry"},
+    {q:"Who does Walt reconnect with to begin cooking meth?",opts:["Jesse Pinkman","Hank Schrader","Gus Fring","Saul Goodman"],a:"Jesse Pinkman"},
+    {q:"What diagnosis changes Walt's outlook?",opts:["Lung cancer","Heart disease","Kidney failure","Leukemia"],a:"Lung cancer"}
+  ];
+  var qi=0,score=0;
+
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active")});
+    var target=document.getElementById(id);
+    if(target){target.classList.add("active")}
+    document.querySelectorAll(".nav button").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-open")===id)});
+    window.scrollTo(0,0);
+  }
+
+  function card(show){
+    var isSaved=saved.indexOf(show.id)>=0;
+    return '<div class="show"><div class="icon">'+show.icon+'</div><h3>'+show.name+'</h3><div class="muted" style="font-size:12px">TV · '+show.genre+'</div><div class="row" style="margin-top:10px"><button class="mini" data-series="'+show.id+'">Start club</button><button class="mini save-btn '+(isSaved?'saved':'')+'" data-save="'+show.id+'">'+(isSaved?'✓ Saved':'+ My List')+'</button></div></div>';
+  }
+
+  function renderLists(){
+    document.getElementById("my-list").innerHTML=shows.filter(function(s){return saved.indexOf(s.id)>=0}).map(card).join("");
+    document.getElementById("explore").innerHTML=shows.map(card).join("");
+    document.getElementById("saved-count").textContent=saved.length+" saved";
+  }
+
+  function renderQuestion(){
+    var area=document.getElementById("trivia-area");
+    if(qi>=questions.length){
+      area.innerHTML='<div class="card complete" style="margin-top:12px"><div class="check">✓</div><div class="k" style="margin-top:10px">trivia complete</div><h1>'+score+'/3</h1><p>You finished the round. Your result can be shared to the spoiler-safe Episode 1 chat.</p></div>';
+      document.getElementById("start-trivia").textContent="Replay Trivia · "+score+"/3";
+      return;
+    }
+    var x=questions[qi];
+    area.innerHTML='<div class="card" style="margin-top:12px"><div class="row between"><div class="k">episode trivia</div><span class="badge">'+(qi+1)+'/3</span></div><div class="progress" style="margin:10px 0 14px"><span style="width:'+((qi/3)*100)+'%"></span></div><h3>'+x.q+'</h3><div class="stack">'+x.opts.map(function(o){return '<button class="quizopt" data-answer="'+o.replace(/"/g,"&quot;")+'">'+o+'</button>'}).join("")+'</div></div>';
+  }
+
+  document.addEventListener("click",function(e){
+    var open=e.target.closest("[data-open]");
+    if(open){showScreen(open.getAttribute("data-open"));return}
+
+    var save=e.target.closest("[data-save]");
+    if(save){
+      var id=save.getAttribute("data-save");
+      var idx=saved.indexOf(id);
+      if(idx>=0){saved.splice(idx,1)}else{saved.push(id)}
+      renderLists();return
+    }
+
+    var series=e.target.closest("[data-series]");
+    if(series){
+      if(series.getAttribute("data-series")==="breaking-bad"){showScreen("map")}
+      else{alert("Full content pack coming next for this title.");}
+      return;
+    }
+
+    var ans=e.target.closest("[data-answer]");
+    if(ans){
+      if(ans.getAttribute("data-answer")===questions[qi].a){score++}
+      qi++;
+      renderQuestion();
+      return;
+    }
+  });
+
+  document.getElementById("watched-btn").addEventListener("click",function(){
+    this.textContent="✓ Marked as Watched";this.classList.add("ghost");
+  });
+
+  document.getElementById("start-trivia").addEventListener("click",function(){
+    qi=0;score=0;renderQuestion();
+  });
+
+  document.getElementById("challenge-btn").addEventListener("click",function(){
+    this.textContent="✓ Challenge completed · +25 XP";this.classList.add("ghost");
+  });
+
+  var j=document.getElementById("journal-text");
+  try{j.value=localStorage.getItem("afterMidnightJournal")||""}catch(err){}
+  document.getElementById("journal-save").addEventListener("click",function(){
+    try{localStorage.setItem("afterMidnightJournal",j.value)}catch(err){}
+    this.textContent="✓ Saved privately";
+  });
+
+  renderLists();
+})();
+</script>
+</body>
+</html>
