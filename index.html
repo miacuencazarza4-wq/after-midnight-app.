@@ -23,6 +23,7 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
 .character-grid{display:grid;gap:10px}.picker-card{display:grid;grid-template-columns:48px 1fr auto;gap:11px;align-items:center;text-align:left;color:inherit;cursor:pointer}
 .profile-switch{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.profile-mode{border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:12px;cursor:pointer}.profile-mode.on{background:var(--pink);color:#24121c;border-color:transparent}
 .tiny{font-size:10px;color:var(--muted)}
+.form-grid{display:grid;gap:13px}.field{display:grid;gap:6px}.field label{font-size:11px;font-weight:800;color:var(--pink2);letter-spacing:.04em}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:12px 13px;font:inherit}.field textarea{min-height:76px;resize:vertical}.club-card{display:grid;grid-template-columns:46px 1fr auto;gap:11px;align-items:center;text-align:left;color:inherit;width:100%;cursor:pointer}.club-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#33233b;font-size:22px}.invite-code{font-size:28px;letter-spacing:.13em;font-weight:900;text-align:center;padding:16px;border:1px dashed #765b7e;border-radius:16px;background:#17111d}.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:12px;border:1px solid var(--line);border-radius:14px;background:#17111d}.stat strong{display:block;font-size:16px}.checkline{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--muted)}.checkline input{margin-top:3px}
 
 .searchbox{display:grid;grid-template-columns:1fr auto;gap:8px;margin:14px 0}
 .searchbox input{border:1px solid var(--line);background:#17111d;color:#fff;border-radius:14px;padding:13px;font-size:15px;min-width:0}
@@ -38,7 +39,7 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
 </head>
 <body>
 <div class="app">
-<section id="home" class="screen active"><div class="top"><div><div class="k">Girls Who Can’t Finish a Show</div><strong>Home</strong></div><span class="badge">4 👥</span></div><div class="pad"><h1>Pick up where you left off</h1><button class="card episode" data-open="map"><div class="node">▶</div><div><div class="k">continue club</div><h2>Breaking Bad</h2><div class="muted">5 seasons · 62 episodes · Season 1 in progress</div></div><span>›</span></button><div class="section-title"><h2>My List</h2><span class="muted" id="saved-count">2 saved</span></div><div class="scroll" id="my-list"></div><div class="section-title"><h2>Explore</h2><button class="mini" data-open="catalog">Browse all</button></div><div class="scroll" id="explore"></div></div></section>
+<section id="home" class="screen active"><div class="top"><div><div class="k">Girls Who Can’t Finish a Show</div><strong>Home</strong></div><span class="badge">4 👥</span></div><div class="pad"><h1>Pick up where you left off</h1><button class="card episode" data-open="map"><div class="node">▶</div><div><div class="k">continue club</div><h2>Breaking Bad</h2><div class="muted">5 seasons · 62 episodes · Season 1 in progress</div></div><span>›</span></button><div class="section-title"><h2>My Clubs</h2><button class="mini" data-open="catalog">＋ New</button></div><div id="home-clubs" class="stack"></div><div class="section-title"><h2>My List</h2><span class="muted" id="saved-count">2 saved</span></div><div class="scroll" id="my-list"></div><div class="section-title"><h2>Explore</h2><button class="mini" data-open="catalog">Browse all</button></div><div class="scroll" id="explore"></div></div></section>
 
 <section id="map" class="screen"><div class="top"><div><div class="k">Season 1 · club progress</div><strong>Breaking Bad</strong></div><span class="badge">4 👥</span></div><div class="pad"><div class="card"><div class="row between"><div><div class="k">series metadata</div><strong>5 seasons · 62 episodes</strong></div><span class="badge">TV data</span></div><p>Season 1 contains 7 episodes. Full metadata import comes next.</p></div><div class="stack" style="margin-top:12px"><button class="card episode" data-open="episode"><div class="node">1</div><div><strong>Episode 1</strong><div>Pilot</div><div class="muted" style="font-size:11px">1/4 watched</div></div><span>›</span></button><button class="card episode lock"><div class="node">2</div><div><strong>Episode 2</strong><div>???</div></div><span>🔒</span></button><button class="card episode lock"><div class="node">3</div><div><strong>Episode 3</strong><div>???</div></div><span>🔒</span></button><button class="card episode lock"><div class="node">4</div><div><strong>Episode 4</strong><div>???</div></div><span>🔒</span></button><button class="card episode lock"><div class="node">5</div><div><strong>Episode 5</strong><div>???</div></div><span>🔒</span></button><button class="card episode lock"><div class="node">6</div><div><strong>Episode 6</strong><div>???</div></div><span>🔒</span></button><button class="card episode lock"><div class="node">7</div><div><strong>Episode 7</strong><div>???</div></div><span>🔒</span></button></div></div></section>
 
@@ -106,6 +107,45 @@ textarea{width:100%;min-height:180px;border-radius:14px;border:1px solid var(--l
   <div class="pad" id="catalog-detail-body"></div>
 </section>
 
+<section id="club-setup" class="screen">
+  <div class="top"><button class="mini" data-open="catalog-detail">‹ Back</button><strong>Create club</strong><span class="badge">Step 1</span></div>
+  <div class="pad">
+    <div class="k" id="setup-kind">series club</div>
+    <h1 id="setup-title">Title</h1>
+    <p>Set the rules now. You can change them later.</p>
+    <div class="card form-grid">
+      <div class="field"><label>Club name</label><input id="club-name" maxlength="60" placeholder="e.g. Girls Who Can’t Finish a Show"></div>
+      <div class="field"><label>Pace</label><select id="club-pace"><option value="1 per week">1 episode/chapter per week</option><option value="2 per week">2 per week</option><option value="3 per week" selected>3 per week</option><option value="daily">Daily</option><option value="no schedule">No fixed schedule</option></select></div>
+      <div class="field"><label>Deadline day</label><select id="club-deadline"><option>Sunday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select></div>
+      <div class="field"><label>Last-person penalty</label><select id="club-penalty"><option value="Playful challenge">Playful challenge</option><option value="Extra trivia">Extra trivia</option><option value="Group chooses">Group chooses</option><option value="None">No penalty</option></select></div>
+      <label class="checkline"><input type="checkbox" id="club-spoilers" checked><span><strong style="color:#fff">Spoiler protection</strong><br>Story-changing events stay locked until everyone reaches them.</span></label>
+      <button class="btn full" id="create-club-final">Create club</button>
+    </div>
+  </div>
+</section>
+
+<section id="club-room" class="screen">
+  <div class="top"><button class="mini" data-open="home">‹ Home</button><strong id="room-title">Club</strong><button class="mini" id="copy-invite">Copy invite</button></div>
+  <div class="pad">
+    <div class="k" id="room-kind">series club</div><h1 id="room-media-title">Title</h1>
+    <div class="card">
+      <div class="k">Invite code</div><div class="invite-code" id="room-code">------</div>
+      <p style="text-align:center;margin-bottom:0">Share this code with the people you want in the club.</p>
+    </div>
+    <div class="stat-grid" style="margin-top:12px">
+      <div class="stat"><span class="tiny">Members</span><strong id="room-members">1</strong></div>
+      <div class="stat"><span class="tiny">Progress</span><strong id="room-progress">Not started</strong></div>
+      <div class="stat"><span class="tiny">Pace</span><strong id="room-pace">3 per week</strong></div>
+      <div class="stat"><span class="tiny">Deadline</span><strong id="room-deadline">Sunday</strong></div>
+    </div>
+    <div class="card" style="margin-top:12px"><div class="row between"><div><div class="k">Spoiler protection</div><strong id="room-spoiler">On</strong></div><span>🔒</span></div><p id="room-penalty">Last watcher: Playful challenge</p></div>
+    <div class="stack" style="margin-top:12px">
+      <button class="btn full" data-open="chats">Open club chats</button>
+      <button class="btn ghost full" id="room-browse-title">Browse title details</button>
+    </div>
+  </div>
+</section>
+
 <section id="profile" class="screen"><div class="top"><div><div class="k">Your fandom life</div><strong>Profile</strong></div><span class="badge">✨</span></div><div class="pad">
 <div class="card" style="text-align:center"><div class="avatar" style="margin:auto;width:70px;height:70px;font-size:28px">✨</div><h2 id="profile-name">Mia</h2><p id="profile-copy">Test profile with adult-character relationship progression unlocked.</p>
 <div class="profile-switch"><button class="profile-mode" id="mode-mia" data-user-mode="mia">✨ Mia · Test</button><button class="profile-mode" id="mode-guest" data-user-mode="guest">👤 Normal user</button></div>
@@ -130,12 +170,22 @@ const shows=[{id:"breaking-bad",icon:"⚗️",name:"Breaking Bad",genre:"Crime d
 let saved=["breaking-bad","stranger-things"];
 let catalogType="series";
 let catalogCache=new Map();
+let currentClubId=null;
+let clubDraft=null;
 const questions=[{q:"What subject does Walter White teach?",opts:["Chemistry","Physics","Biology","Mathematics"],a:"Chemistry"},{q:"Who does Walt reconnect with to begin cooking meth?",opts:["Jesse Pinkman","Hank Schrader","Gus Fring","Saul Goodman"],a:"Jesse Pinkman"},{q:"What diagnosis changes Walt's outlook?",opts:["Lung cancer","Heart disease","Kidney failure","Leukemia"],a:"Lung cancer"}];
 let qi=0,score=0;
 
 function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id)?.classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.open===id));window.scrollTo(0,0)}
 function card(s){const is=saved.includes(s.id);return `<div class="show"><div class="icon">${s.icon}</div><h3>${s.name}</h3><div class="muted" style="font-size:12px">TV · ${s.genre}</div><div class="row" style="margin-top:10px"><button class="mini" data-series="${s.id}">Start club</button><button class="mini save-btn ${is?"saved":""}" data-save="${s.id}">${is?"✓ Saved":"+ My List"}</button></div></div>`}
 function renderLists(){document.getElementById("my-list").innerHTML=shows.filter(s=>saved.includes(s.id)).map(card).join("");document.getElementById("explore").innerHTML=shows.map(card).join("");document.getElementById("saved-count").textContent=saved.length+" saved"}
+function loadClubs(){try{return JSON.parse(localStorage.getItem("afterMidnightClubs")||"[]")}catch{return []}}
+function saveClubs(clubs){localStorage.setItem("afterMidnightClubs",JSON.stringify(clubs))}
+function clubEmoji(kind){return kind==="books"?"📚":kind==="movies"?"🎬":"📺"}
+function makeInviteCode(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";for(let i=0;i<6;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out}
+function renderHomeClubs(){const el=document.getElementById("home-clubs");const clubs=loadClubs();if(!clubs.length){el.innerHTML='<div class="empty-state" style="padding:18px 14px"><strong>No clubs yet</strong><p style="margin-bottom:0">Choose a title from Explore to create one.</p></div>';return}el.innerHTML=clubs.slice().reverse().map(c=>`<button class="card club-card" data-open-club="${c.id}"><div class="club-icon">${clubEmoji(c.kind)}</div><div><strong>${escapeHtml(c.name)}</strong><div class="muted" style="font-size:11px">${escapeHtml(c.title)} · ${escapeHtml(c.pace)}</div></div><span>›</span></button>`).join("")}
+function openClubSetup(title,kind){clubDraft={title,kind:kind||"series"};localStorage.setItem("afterMidnightClubDraft",JSON.stringify(clubDraft));document.getElementById("setup-title").textContent=title;document.getElementById("setup-kind").textContent=(kind==="books"?"book":kind==="movies"?"movie":"series")+" club";document.getElementById("club-name").value=title+" Club";showScreen("club-setup")}
+function createClub(){if(!clubDraft){try{clubDraft=JSON.parse(localStorage.getItem("afterMidnightClubDraft")||"null")}catch{}}if(!clubDraft)return;const name=document.getElementById("club-name").value.trim()||clubDraft.title+" Club";const club={id:"club_"+Date.now(),title:clubDraft.title,kind:clubDraft.kind,name,pace:document.getElementById("club-pace").value,deadline:document.getElementById("club-deadline").value,penalty:document.getElementById("club-penalty").value,spoilerProtection:document.getElementById("club-spoilers").checked,inviteCode:makeInviteCode(),members:1,progress:"Not started",createdAt:Date.now()};const clubs=loadClubs();clubs.push(club);saveClubs(clubs);currentClubId=club.id;renderHomeClubs();openClubRoom(club.id)}
+function openClubRoom(id){const c=loadClubs().find(x=>x.id===id);if(!c)return;currentClubId=id;document.getElementById("room-title").textContent=c.name;document.getElementById("room-media-title").textContent=c.title;document.getElementById("room-kind").textContent=(c.kind==="books"?"book":c.kind==="movies"?"movie":"series")+" club";document.getElementById("room-code").textContent=c.inviteCode;document.getElementById("room-members").textContent=c.members;document.getElementById("room-progress").textContent=c.progress;document.getElementById("room-pace").textContent=c.pace;document.getElementById("room-deadline").textContent=c.deadline;document.getElementById("room-spoiler").textContent=c.spoilerProtection?"On":"Off";document.getElementById("room-penalty").textContent="Last watcher: "+c.penalty;showScreen("club-room")}
 
 function stripHtml(s){const d=document.createElement("div");d.innerHTML=s||"";return d.textContent||d.innerText||""}
 function escAttr(s){return escapeHtml(String(s)).replaceAll("`","&#096;")}
@@ -310,11 +360,12 @@ document.addEventListener("click",e=>{
  const picked=e.target.closest("[data-pick-character]");if(picked){activeCharacter=picked.dataset.pickCharacter;addActiveChat(activeCharacter);renderChat();showScreen("character-chat");return}
  const mode=e.target.closest("[data-user-mode]");if(mode){userMode=mode.dataset.userMode;localStorage.setItem("afterMidnightUserMode",userMode);renderProfileMode();renderActiveChats();return}
  const cat=e.target.closest("[data-catalog-kind]");if(cat){openCatalogItem(cat.dataset.catalogKind,cat.dataset.catalogId);return}
- const starter=e.target.closest("[data-start-catalog]");if(starter){localStorage.setItem("afterMidnightClubDraft",JSON.stringify({title:starter.dataset.startCatalog,kind:starter.dataset.startKind||catalogType,createdAt:Date.now()}));const result=document.getElementById("club-action-result");if(result)result.innerHTML='<div class="notice" style="margin-top:12px"><span class="good">✓ Club created.</span> You can now invite members and set your pace.</div>';starter.textContent="✓ Club created";starter.classList.add("ghost");return}
+ const starter=e.target.closest("[data-start-catalog]");if(starter){openClubSetup(starter.dataset.startCatalog,starter.dataset.startKind||catalogType);return}
+ const clubOpen=e.target.closest("[data-open-club]");if(clubOpen){openClubRoom(clubOpen.dataset.openClub);return}
  const open=e.target.closest("[data-open]");if(open){showScreen(open.dataset.open);return}
  const char=e.target.closest("[data-character]");if(char){activeCharacter=char.dataset.character;addActiveChat(activeCharacter);renderChat();showScreen("character-chat");return}
  const save=e.target.closest("[data-save]");if(save){const id=save.dataset.save;saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];renderLists();return}
- const series=e.target.closest("[data-series]");if(series){if(series.dataset.series==="breaking-bad")showScreen("map");else alert("Full content pack coming next for this title.");return}
+ const series=e.target.closest("[data-series]");if(series){const s=shows.find(x=>x.id===series.dataset.series);if(s)openClubSetup(s.name,"series");return}
  const ans=e.target.closest("[data-answer]");if(ans){if(ans.dataset.answer===questions[qi].a)score++;qi++;renderQuestion()}
 });
 document.getElementById("watched-btn").onclick=function(){this.textContent="✓ Marked as Watched";this.classList.add("ghost")};
@@ -326,11 +377,14 @@ document.getElementById("tab-movies").onclick=()=>setCatalogType("movies");
 document.getElementById("tab-books").onclick=()=>setCatalogType("books");
 document.getElementById("catalog-search-btn").onclick=()=>searchCatalog();
 document.getElementById("catalog-search").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchCatalog()}});
+document.getElementById("create-club-final").onclick=createClub;
+document.getElementById("copy-invite").onclick=async function(){const code=document.getElementById("room-code").textContent;try{await navigator.clipboard.writeText(code);this.textContent="✓ Copied";setTimeout(()=>this.textContent="Copy invite",1400)}catch{this.textContent=code}};
+document.getElementById("room-browse-title").onclick=function(){showScreen("catalog")};
 document.getElementById("chat-menu").onclick=function(){const a=document.getElementById("chat-actions");a.style.display=a.style.display==="none"?"block":"none"};
 document.getElementById("delete-chat").onclick=function(){const p=profiles[activeCharacter];const history=loadHistory();if(!confirm("Delete your visible conversation with "+p.name+"? A small relationship memory can stay on this device."))return;const userLines=history.filter(m=>m.role==="user").slice(-6).map(m=>m.content.trim()).filter(Boolean);if(userLines.length)localStorage.setItem(memoryKey(),"Previous conversation themes: "+userLines.join(" | "));localStorage.removeItem(storageKey());saveActiveChats(loadActiveChats().filter(id=>id!==activeCharacter));renderActiveChats();showScreen("chats")};
 document.getElementById("forget-chat").onclick=function(){const p=profiles[activeCharacter];if(!confirm("Forget everything about your relationship with "+p.name+"? This also resets trust."))return;localStorage.removeItem(storageKey());localStorage.removeItem(memoryKey());localStorage.removeItem(countKey());saveActiveChats(loadActiveChats().filter(id=>id!==activeCharacter));renderActiveChats();showScreen("chats")};
 document.getElementById("send-chat").onclick=sendMessage;document.getElementById("chat-input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});
-renderLists();renderPicker();renderActiveChats();renderProfileMode();
+renderLists();renderHomeClubs();renderPicker();renderActiveChats();renderProfileMode();
 })();
 </script>
 </body></html>
